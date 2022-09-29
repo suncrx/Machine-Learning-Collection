@@ -169,6 +169,7 @@ if __name__ == "__main__":
     )
 
     # Create model and fit it to the data
+    model = KMeansClustering(X, num_clusters=3)
     model.fit(X)
 
     # Plot the results
