@@ -1,0 +1,62 @@
+"""
+Test the implementation of knn to sklearn's knn to
+ensure that the implementation is correct. Ensure
+that they both get similar accuracy scores
+"""
+
+import sys
+import unittest
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn import datasets
+
+# For importing from different folders
+# OBS: This is supposed to be done with automated testing,
+# hence relative to folder we want to import from
+sys.path.append("ML/algorithms/knn")
+# If run from local:
+# sys.path.append("../../ML/algorithms/knn")
+from knn import KNearestNeighbor
+
+
+class TestKNN(unittest.TestCase):
+    def setUp(self):
+        self.iris = datasets.load_iris()
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+            self.iris.data, self.iris.target, test_size=0.2, random_state=42
+        )
+        self.knn = KNearestNeighbor(k=3)
+        self.knn.train(self.X_train, self.y_train)
+        self.knn_sklearn = KNeighborsClassifier(n_neighbors=3)
+        self.knn_sklearn.fit(self.X_train, self.y_train)
+
+    def test_knn(self):
+        # test self.knn.predict using num_loops=0, num_loops=1 and num_loops=2
+        y_pred = self.knn.predict(self.X_test, num_loops=0)
+        y_pred_1 = self.knn.predict(self.X_test, num_loops=1)
+        y_pred_2 = self.knn.predict(self.X_test, num_loops=2)
+
+        # test sklearn's KNN
+        y_pred_sklearn = self.knn_sklearn.predict(self.X_test)
+
+        # ensure that the predictions are the same
+        np.testing.assert_array_equal(y_pred, y_pred_1)
+        np.testing.assert_array_equal(y_pred, y_pred_2)
+        np.testing.assert_array_equal(y_pred, y_pred_sklearn)
+
+        # ensure that the accuracy scores are the same
+        accuracy = accuracy_score(self.y_test, y_pred)
+        accuracy_1 = accuracy_score(self.y_test, y_pred_1)
+        accuracy_2 = accuracy_score(self.y_test, y_pred_2)
+        accuracy_sklearn = accuracy_score(self.y_test, y_pred_sklearn)
+
+        # The accuracies should almost equal
+        self.assertAlmostEqual(accuracy, accuracy_1)
+        self.assertAlmostEqual(accuracy, accuracy_2)
+        self.assertAlmostEqual(accuracy, accuracy_sklearn)
+
+
+if __name__ == "__main__":
+    unittest.main()
