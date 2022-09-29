@@ -12,9 +12,9 @@ Programmed by Aladdin Persson <aladdin.persson at hotmail dot com>
 """
 
 # Imports
-import numpy as np # For matrix operations
-import matplotlib.pyplot as plt # For plotting
-from sklearn.datasets import make_blobs # For generating data
+import numpy as np  # For matrix operations
+import matplotlib.pyplot as plt  # For plotting
+from sklearn.datasets import make_blobs  # For generating data
 
 
 class KMeansClustering:
@@ -46,7 +46,7 @@ class KMeansClustering:
 
     def create_clusters(self, X, centroids):
         """
-        Creates clusters by assigning each sample to the closest centroid	
+        Creates clusters by assigning each sample to the closest centroid
 
         Parameters:
             X: dataset to create clusters from
@@ -76,7 +76,7 @@ class KMeansClustering:
 
         Returns:
             centroids: new centroids as the means of the samples in each cluster
-        
+
         """
         centroids = np.zeros((self.K, self.num_features))
         for idx, cluster in enumerate(clusters):
@@ -106,7 +106,7 @@ class KMeansClustering:
 
     def plot_fig(self, X, y):
         """
-        Plots the data and the clusters	
+        Plots the data and the clusters
 
         Parameters:
             X: dataset to plot
@@ -119,7 +119,7 @@ class KMeansClustering:
 
     def fit(self, X):
         """
-        Fits the K means clustering model to the dataset X	
+        Fits the K means clustering model to the dataset X
 
         Parameters:
             X: dataset to fit the model to
@@ -127,7 +127,7 @@ class KMeansClustering:
         Returns:
             centroids: final centroids of the model
             y_pred: predicted clusters for each sample in X
-        
+
         """
         centroids = self.initialize_random_centroids(X)
 
@@ -160,7 +160,12 @@ if __name__ == "__main__":
 
     # Generate data
     X, y = make_blobs(
-        n_samples=1500, n_features=2, centers=3, cluster_std=0.5, shuffle=True, random_state=0
+        n_samples=1500,
+        n_features=2,
+        centers=3,
+        cluster_std=0.5,
+        shuffle=True,
+        random_state=0,
     )
 
     # Create model and fit it to the data
@@ -169,9 +174,3 @@ if __name__ == "__main__":
 
     # Plot the results
     model.plot_fig(X, y)
-    
-
-
-
-
-    
