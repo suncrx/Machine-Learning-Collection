@@ -5,9 +5,13 @@ or a heavily vectorized zero-loop implementation.
 
 Programmed by Aladdin Persson <aladdin.persson at hotmail dot com>
 *    2020-04-24 Initial coding
+*    2022-09-29 Ensured code works as intended and added docstrings
 """
 
 import numpy as np
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 
 class KNearestNeighbor:
@@ -20,6 +24,20 @@ class KNearestNeighbor:
         self.y_train = y
 
     def predict(self, X_test, num_loops=0):
+        """
+        Predict labels for test data using KNN
+
+        Parameters:
+            X_test: numpy array of shape (num_test, D)
+                    Test data consisting of num_test samples each of dimension D.
+            num_loops: determines which implementation to use to compute distances
+
+        Returns:
+            y: numpy array of shape (num_test,)
+                Predicted labels for the test data, where y[i] is the predicted label
+                for the test point X[i].
+
+        """
         if num_loops == 0:
             distances = self.compute_distance_vectorized(X_test)
 
@@ -33,8 +51,13 @@ class KNearestNeighbor:
 
     def compute_distance_two_loops(self, X_test):
         """
-        Inefficient naive implementation, use only
-        as a way of understanding what kNN is doing
+        Naive implementation of KNN using two loops
+
+        Parameters:
+            X_test: numpy array of shape (num_test, D)
+
+        Returns:
+            distances: numpy array of shape (num_test, num_train)
         """
 
         num_test = X_test.shape[0]
@@ -52,8 +75,13 @@ class KNearestNeighbor:
 
     def compute_distance_one_loop(self, X_test):
         """
-        Much better than two-loops but not as fast as fully vectorized version.
-        Utilize Numpy broadcasting in X_train - X_test[i,:]
+        Naive implementation of KNN using one loop
+
+        Parameters:
+            X_test: numpy array of shape (num_test, D)
+
+        Returns:
+            distances: numpy array of shape (num_test, num_train)
         """
         num_test = X_test.shape[0]
         num_train = self.X_train.shape[0]
@@ -73,11 +101,17 @@ class KNearestNeighbor:
         vecotorization as well as numpy broadcasting.
         Idea: if we have two vectors a, b (two examples)
         and for vectors we can compute (a-b)^2 = a^2 - 2a (dot) b + b^2
-        expanding on this and doing so for every vector lends to the 
+        expanding on this and doing so for every vector lends to the
         heavy vectorized formula for all examples at the same time.
+
+        Parameters:
+            X_test: numpy array of shape (num_test, D)
+
+        Returns:
+            distances: numpy array of shape (num_test, num_train)
         """
-        X_test_squared = np.sum(X_test ** 2, axis=1, keepdims=True)
-        X_train_squared = np.sum(self.X_train ** 2, axis=1, keepdims=True)
+        X_test_squared = np.sum(X_test**2, axis=1, keepdims=True)
+        X_train_squared = np.sum(self.X_train**2, axis=1, keepdims=True)
         two_X_test_X_train = np.dot(X_test, self.X_train.T)
 
         # (Taking sqrt is not necessary: min distance won't change since sqrt is monotone)
@@ -86,6 +120,15 @@ class KNearestNeighbor:
         )
 
     def predict_labels(self, distances):
+        """
+        Given distances between test data and training data, predict labels
+
+        Parameters:
+            distances: numpy array of shape (num_test, num_train)
+
+        Returns:
+            y: numpy array of shape (num_test,)
+        """
         num_test = distances.shape[0]
         y_pred = np.zeros(num_test)
 
@@ -98,13 +141,25 @@ class KNearestNeighbor:
 
 
 if __name__ == "__main__":
-    X = np.loadtxt("example_data/data.txt", delimiter=",")
-    y = np.loadtxt("example_data/targets.txt")
+    """
+    Testing the KNN implementation
+    """
 
-    X = np.array([[1, 1], [3, 1], [1, 4], [2, 4], [3, 3], [5, 1]])
-    y = np.array([0, 0, 0, 1, 1, 1])
+    # Load the dataset
+    iris = datasets.load_iris()
+    X = iris.data
+    y = iris.target
 
-    KNN = KNearestNeighbor(k=1)
-    KNN.train(X, y)
-    y_pred = KNN.predict(X, num_loops=0)
-    print(f"Accuracy: {sum(y_pred == y) / y.shape[0]}")
+    # Split the dataset into train and test
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+    # Train the model
+    knn = KNearestNeighbor(k=3)
+    knn.train(X_train, y_train)
+
+    # Predict the labels
+    y_pred = knn.predict(X_test, num_loops=0)
+
+    # Compute the accuracy
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Accuracy: {accuracy}")
