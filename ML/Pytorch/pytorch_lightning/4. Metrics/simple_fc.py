@@ -85,7 +85,7 @@ input_size = 784
 num_classes = 10
 learning_rate = 0.001
 batch_size = 64
-num_epochs = 3
+num_epochs = 20
 
 # Load Data
 entire_dataset = datasets.MNIST(
@@ -106,7 +106,7 @@ model = NN(input_size=input_size, num_classes=num_classes).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
-trainer = pl.Trainer(accelerator="gpu", devices=1, min_epochs=1, max_epochs=3, precision=16)
+trainer = pl.Trainer(accelerator="auto", devices="auto", min_epochs=1, max_epochs=3, precision=16)
 trainer.fit(model, train_loader, val_loader)
 trainer.validate(model, val_loader)
 trainer.test(model, test_loader)

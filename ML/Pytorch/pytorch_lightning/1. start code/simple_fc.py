@@ -22,22 +22,23 @@ class NN(nn.Module):
 
 # Set device cuda for GPU if it's available otherwise run on the CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print('Device: ', device)
 
 # Hyperparameters
-input_size = 784
+input_size = 28*28
 num_classes = 10
 learning_rate = 0.001
 batch_size = 64
 num_epochs = 3
 
 # Load Data
-entire_dataset = datasets.MNIST(
-    root="dataset/", train=True, transform=transforms.ToTensor(), download=True
-)
+entire_dataset = datasets.MNIST(root="dataset/", train=True,
+                                transform=transforms.ToTensor(), download=True)
 train_ds, val_ds = random_split(entire_dataset, [50000, 10000])
-test_ds = datasets.MNIST(
-    root="dataset/", train=False, transform=transforms.ToTensor(), download=True
-)
+
+test_ds = datasets.MNIST(root="dataset/", train=False,
+                         transform=transforms.ToTensor(), download=True)
+
 train_loader = DataLoader(dataset=train_ds, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(dataset=train_ds, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(dataset=test_ds, batch_size=batch_size, shuffle=False)

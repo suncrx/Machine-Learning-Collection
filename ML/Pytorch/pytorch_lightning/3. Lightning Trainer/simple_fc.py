@@ -4,7 +4,6 @@ import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from torch import nn, optim
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 from torch.utils.data import random_split
 import pytorch_lightning as pl
 
@@ -58,7 +57,7 @@ class NN(pl.LightningModule):
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Hyperparameters
-input_size = 784
+input_size = 28*28   #size of the input images
 num_classes = 10
 learning_rate = 0.001
 batch_size = 64
@@ -84,12 +83,12 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 trainer = pl.Trainer(
-    accelerator="gpu", 
-    devices=1, 
+    accelerator="auto", 
+    devices="auto",
     min_epochs=1, 
     max_epochs=3, 
-    precision=16,
-)
+    precision=16)
+
 trainer.fit(model, train_loader, val_loader)
 trainer.validate(model, val_loader)
 trainer.test(model, test_loader)
